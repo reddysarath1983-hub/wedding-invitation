@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-telugu: 'Noto Sans Telugu', sans-serif;
+    --font-heading: 'Cinzel', serif;
+    --font-script: 'Great Vibes', cursive;
+    --font-serif-luxury: 'Cormorant Garamond', Georgia, serif;
+  }
+}
+
+.font-telugu {
+  font-family: var(--font-telugu), sans-serif;
+}
+
+.font-heading {
+  font-family: var(--font-heading), serif;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+.font-luxury {
+  font-family: var(--font-serif-luxury), Georgia, serif;
+}
+
+/* Gold Metallic Text Gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #b8860b 0%, #d4af37 25%, #aa771c 50%, #f5d77f 75%, #996515 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Cream Paper Subtle Texture */
+.bg-stationery-ivory {
+  background-color: #fdfbf7;
+  background-image: radial-gradient(#e5dec9 0.75px, transparent 0.75px);
+  background-size: 24px 24px;
+}
+
+.bg-stationery-royal {
+  background-color: #4a0e17;
+  background-image: radial-gradient(#7c1a29 0.75px, transparent 0.75px);
+  background-size: 24px 24px;
+}
+
+.bg-stationery-modern {
+  background-color: #f9f6f0;
+  background-image: radial-gradient(#dce4df 0.75px, transparent 0.75px);
+  background-size: 24px 24px;
+}
+
+/* Ornamental Borders */
+.border-gold-ornate {
+  border-style: solid;
+  border-image: linear-gradient(to bottom, #d4af37, #8b6508, #d4af37) 1;
+}
+
+/* Smooth Envelope Reveal Animation */
+@keyframes revealFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-reveal-up {
+  animation: revealFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

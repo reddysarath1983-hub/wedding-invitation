@@ -1,0 +1,9 @@
+export { TraditionalHeritageTemplate } from "./TraditionalHeritageTemplate";
+export { KalamkariArtTemplate } from "./KalamkariArtTemplate";
+export { BanarasiSilkTemplate } from "./BanarasiSilkTemplate";
+export { VintagePatrikaTemplate } from "./VintagePatrikaTemplate";
+export { ModernLuxuryTemplate } from "./ModernLuxuryTemplate";
+export { NischitardhamTemplate } from "./NischitardhamTemplate";
+export { HaldiCeremonyTemplate } from "./HaldiCeremonyTemplate";
+export { SangeetMehendiTemplate } from "./SangeetMehendiTemplate";
+export { SacredVivahaTemplate } from "./SacredVivahaTemplate";
