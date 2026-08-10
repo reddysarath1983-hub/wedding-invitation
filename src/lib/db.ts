@@ -179,11 +179,19 @@ function formatPrismaInvitation(inv: any): InvitationData {
 }
 
 // Slug generator
-export async function generateSlug(groomName: string, brideName: string, excludeId?: string): Promise<string> {
-  const raw = `${groomName} ${brideName}`.trim().toLowerCase();
-  let baseSlug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+export async function generateSlug(groomName: string, brideName: string, excludeId?: string, customSlug?: string): Promise<string> {
+  let baseSlug = "";
+  if (customSlug && customSlug.trim()) {
+    baseSlug = customSlug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+
   if (!baseSlug) {
-    baseSlug = "wedding-invitation";
+    const raw = `${groomName} ${brideName}`.trim().toLowerCase();
+    baseSlug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+
+  if (!baseSlug) {
+    baseSlug = "rahul-priya";
   }
 
   let slug = baseSlug;
@@ -429,7 +437,7 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
 export async function createInvitation(data: Partial<InvitationData>): Promise<InvitationData> {
   const groomName = data.groom_name || "Groom";
   const brideName = data.bride_name || "Bride";
-  const slug = data.slug || (await generateSlug(groomName, brideName));
+  const slug = await generateSlug(groomName, brideName, undefined, data.slug);
   const imageTransformsStr =
     typeof data.image_transforms === "object"
       ? JSON.stringify(data.image_transforms)
@@ -532,8 +540,8 @@ export async function updateInvitation(id: string, data: Partial<InvitationData>
   const groomName = data.groom_name ?? existing.groom_name;
   const brideName = data.bride_name ?? existing.bride_name;
   let slug = existing.slug;
-  if (data.slug && data.slug !== existing.slug) {
-    slug = await generateSlug(groomName, brideName, id);
+  if (data.slug) {
+    slug = await generateSlug(groomName, brideName, id, data.slug);
   }
 
   const imageTransformsStr =

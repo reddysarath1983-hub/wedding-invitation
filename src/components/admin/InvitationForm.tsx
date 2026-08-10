@@ -9,7 +9,7 @@ import { GalleryUploader } from "./GalleryUploader";
 import { uploadImage } from "@/lib/api";
 import { 
   Heart, Calendar, MapPin, Sparkles, Music, Image as ImageIcon, 
-  Users, Save, Send, Loader2, Upload
+  Users, Save, Send, Loader2, Upload, Link2
 } from "lucide-react";
 
 interface InvitationFormProps {
@@ -21,22 +21,22 @@ interface InvitationFormProps {
 
 export function InvitationForm({ initialData, onSave, onPreviewChange, isSaving }: InvitationFormProps) {
   const [formData, setFormData] = useState<InvitationData>({
-    groom_name: initialData.groom_name || "చి. రాహుల్ (Chi. Rahul)",
-    bride_name: initialData.bride_name || "చి.ల.సౌ. ప్రియ (Chi. La. Sow. Priya)",
-    groom_photo: initialData.groom_photo || "",
-    bride_photo: initialData.bride_photo || "",
-    couple_photo: initialData.couple_photo || "",
+    groom_name: initialData.groom_name || "రాహుల్ (Rahul)",
+    bride_name: initialData.bride_name || "ప్రియ (Priya)",
+    groom_photo: initialData.groom_photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+    bride_photo: initialData.bride_photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+    couple_photo: initialData.couple_photo || "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80",
     wedding_date: initialData.wedding_date || "2026-11-20",
     wedding_time: initialData.wedding_time || "10:30 AM",
     venue_name: initialData.venue_name || "శ్రీ వెంకటేశ్వర స్వామి కళ్యాణ మంటపం",
-    venue_address: initialData.venue_address || "రోడ్ నెం. 12, బంజారా హిల్స్, హైదరాబాద్, తెలంగాణ",
-    google_maps_url: initialData.google_maps_url || "",
+    venue_address: initialData.venue_address || "రోడ్ నెం. 12, బంజారా హిల్స్, హైదరాబాద్, తెలంగాణ - 500034",
+    google_maps_url: initialData.google_maps_url || "https://maps.google.com/?q=Banjara+Hills+Hyderabad",
     template_id: (initialData.template_id as TemplateId) || "traditional",
     background_music_url: initialData.background_music_url || "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=flute-traditional-11234.mp3",
-    invitation_text: initialData.invitation_text || "శ్రీరస్తు శుభమస్తు అభయహస్తు.\nమా ప్రియమైన కుమారుడు చి. రాహుల్ మరియు ప్రియమైన కుమార్తె చి.ల.సౌ. ప్రియ ల వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి నూతన వధూవరులను ఆశీర్వదించవలసిందిగా మనస్ఫూర్తిగా ఆహ్వానిస్తున్నాము.",
+    invitation_text: initialData.invitation_text || "శ్రీరస్తు శుభమస్తు అభయహస్తు.\nమా ప్రియమైన కుమారుడు రాహుల్ మరియు ప్రియమైన కుమార్తె ప్రియ ల వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి నూతన వధూవరులను ఆశీర్వదించవలసిందిగా మనస్ఫూర్తిగా ఆహ్వానిస్తున్నాము.",
     status: initialData.status || "DRAFT",
-    slug: initialData.slug || "",
-    events: initialData.events || [
+    slug: initialData.slug || "rahul-priya",
+    events: initialData.events && initialData.events.length > 0 ? initialData.events : [
       {
         title: "మాంగల్య ధారణ వివాహ మహోత్సవం (Wedding Ceremony)",
         date: initialData.wedding_date || "2026-11-20",
@@ -46,11 +46,14 @@ export function InvitationForm({ initialData, onSave, onPreviewChange, isSaving 
         display_order: 1
       }
     ],
-    family_members: initialData.family_members || [
+    family_members: initialData.family_members && initialData.family_members.length > 0 ? initialData.family_members : [
       { name: "శ్రీమతి & శ్రీ (వధువు తల్లిదండ్రులు)", relation: "వధువు తల్లిదండ్రులు", side: "bride", display_order: 1 },
       { name: "శ్రీమతి & శ్రీ (వరుడి తల్లిదండ్రులు)", relation: "వరుడి తల్లిదండ్రులు", side: "groom", display_order: 2 }
     ],
-    gallery_images: initialData.gallery_images || []
+    gallery_images: initialData.gallery_images && initialData.gallery_images.length > 0 ? initialData.gallery_images : [
+      { image_url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80", display_order: 1 },
+      { image_url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80", display_order: 2 }
+    ]
   });
 
   const [uploadingGroom, setUploadingGroom] = useState(false);
@@ -123,7 +126,7 @@ export function InvitationForm({ initialData, onSave, onPreviewChange, isSaving 
             {formData.status}
           </span>
           <h2 className="text-lg font-bold text-slate-100 font-telugu">
-            {formData.groom_name} 💍 {formData.bride_name}
+            {formData.groom_name || "Groom"} 💍 {formData.bride_name || "Bride"}
           </h2>
         </div>
 
@@ -149,16 +152,37 @@ export function InvitationForm({ initialData, onSave, onPreviewChange, isSaving 
         </div>
       </div>
 
-      {/* SECTION 1 — COUPLE */}
+      {/* SECTION 1 — COUPLE & CUSTOM URL SLUG */}
       <section className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
         <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
           <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
           <h3 className="text-base font-bold text-slate-100 font-telugu">
-            1. వధూవరుల వివరాలు (Couple Information & Titles)
+            1. వధూవరుల వివరాలు & లింక్ (Couple Info & Custom Web Link)
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Custom Slug Box */}
+        <div className="bg-slate-950/80 p-4 rounded-xl border border-amber-500/30">
+          <label className="block text-xs font-semibold text-amber-300 font-telugu mb-1 flex items-center gap-1">
+            <Link2 className="w-4 h-4 text-amber-400" />
+            <span>ప్రత్యేక ఆహ్వాన Web లింక్ (Custom Web Link Slug)</span>
+          </label>
+          <div className="flex items-center gap-2 bg-slate-900 px-3 py-2.5 rounded-xl border border-slate-800 font-mono text-xs">
+            <span className="text-slate-400">/invite/</span>
+            <input
+              type="text"
+              value={formData.slug || ""}
+              onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+              placeholder="e.g. rahul-priya or surya-anu"
+              className="flex-1 bg-transparent text-amber-300 font-bold focus:outline-none placeholder-slate-600"
+            />
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1.5">
+            మీ శ్రేయోభిలాషులకు షేర్ చేయడానికి ఇది మీ ఆహ్వాన పత్రిక ప్రత్యేక లింక్ (e.g. rahul-priya, surya-anu).
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-xs font-semibold text-slate-300 font-telugu">
