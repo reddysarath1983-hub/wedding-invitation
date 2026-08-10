@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { InvitationData, ImageTransform } from "@/types/invitation";
 import { RoyalTempleTemplate } from "./RoyalTempleTemplate";
 import { ModernFloralTemplate } from "./ModernFloralTemplate";
@@ -40,8 +40,24 @@ export function parseImageTransforms(transforms?: any): Record<string, ImageTran
 export function TemplateContainer({ data, editable = false, onTransformChange }: TemplateContainerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedImageKey, setSelectedImageKey] = useState<string | null>(null);
+  const [invData, setInvData] = useState<InvitationData>(data);
 
-  const transformsMap = parseImageTransforms(data.image_transforms);
+  useEffect(() => {
+    setInvData(data);
+    if (typeof window !== "undefined" && data.slug) {
+      try {
+        const stored = localStorage.getItem(`pellipatrika_inv_${data.slug}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.slug === data.slug) {
+            setInvData(parsed);
+          }
+        }
+      } catch {}
+    }
+  }, [data]);
+
+  const transformsMap = parseImageTransforms(invData.image_transforms);
 
   const handleSelectImage = (key: string) => {
     if (editable) {
@@ -56,7 +72,7 @@ export function TemplateContainer({ data, editable = false, onTransformChange }:
   };
 
   const templateProps = {
-    data,
+    data: invData,
     editable,
     selectedImageKey,
     transformsMap,

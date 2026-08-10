@@ -555,18 +555,28 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
   );
   if (found) return { ...found };
 
-  // Dynamic fallback invitation so any URL like /invite/sarath-kumar or /invite/surya-jyothika never 404s
+  // Dynamic fallback for unseeded dynamic URL slugs (returns clean empty photos so user photos are never overwritten by demo pictures)
   const words = (sanitizedSlug || "wedding").split("-").filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1));
-  const groom = words[0] || "Sarath";
-  const bride = words.slice(1).join(" ") || "Priya";
+  const groom = words[0] || "Groom";
+  const bride = words.slice(1).join(" ") || "Bride";
 
   return {
-    ...DEFAULT_DEMO_INVITATION,
     id: `dyn-${sanitizedSlug}`,
     slug: sanitizedSlug || "wedding",
     groom_name: groom,
     bride_name: bride,
-    status: "PUBLISHED"
+    groom_photo: undefined,
+    bride_photo: undefined,
+    couple_photo: undefined,
+    wedding_date: "2026-11-20",
+    wedding_time: "10:30 AM",
+    venue_name: "శ్రీ వెంకటేశ్వర స్వామి కళ్యాణ మంటపం",
+    venue_address: "హైదరాబాద్, తెలంగాణ",
+    template_id: "traditional",
+    status: "PUBLISHED",
+    events: [],
+    family_members: [],
+    gallery_images: []
   };
 }
 

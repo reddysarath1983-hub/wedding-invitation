@@ -97,7 +97,13 @@ export async function createInvitation(data: Partial<InvitationData>): Promise<I
     const err = await res.json().catch(() => ({ detail: "Failed to create invitation" }));
     throw new Error(err.detail || "Failed to create invitation");
   }
-  return res.json();
+  const created: InvitationData = await res.json();
+  if (typeof window !== "undefined" && created.slug) {
+    try {
+      localStorage.setItem(`pellipatrika_inv_${created.slug}`, JSON.stringify(created));
+    } catch {}
+  }
+  return created;
 }
 
 export async function updateInvitation(id: string, data: Partial<InvitationData>): Promise<InvitationData> {
@@ -113,7 +119,13 @@ export async function updateInvitation(id: string, data: Partial<InvitationData>
     const err = await res.json().catch(() => ({ detail: "Failed to update invitation" }));
     throw new Error(err.detail || "Failed to update invitation");
   }
-  return res.json();
+  const updated: InvitationData = await res.json();
+  if (typeof window !== "undefined" && updated.slug) {
+    try {
+      localStorage.setItem(`pellipatrika_inv_${updated.slug}`, JSON.stringify(updated));
+    } catch {}
+  }
+  return updated;
 }
 
 export async function duplicateInvitation(id: string): Promise<InvitationData> {
