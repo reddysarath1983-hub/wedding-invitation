@@ -242,18 +242,18 @@ export function transliterateTeluguToEnglish(str: string): string {
 export async function generateSlug(groomName: string, brideName: string, excludeId?: string, customSlug?: string): Promise<string> {
   let baseSlug = "";
   if (customSlug && customSlug.trim() && customSlug.trim() !== "rahul-priya" && customSlug.trim() !== "wedding-invitation") {
-    baseSlug = customSlug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    baseSlug = cleanSlug(customSlug);
   }
 
   if (!baseSlug) {
     const raw = `${groomName} ${brideName}`.trim().toLowerCase();
-    baseSlug = raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    baseSlug = cleanSlug(raw);
   }
 
   if (!baseSlug) {
     const gRoman = transliterateTeluguToEnglish(groomName);
     const bRoman = transliterateTeluguToEnglish(brideName);
-    baseSlug = `${gRoman}-${bRoman}`.replace(/^-+|-+$/g, "");
+    baseSlug = cleanSlug(`${gRoman}-${bRoman}`);
   }
 
   if (!baseSlug) {
@@ -478,25 +478,67 @@ export async function getInvitationById(id: string): Promise<InvitationData | nu
   return found ? { ...found } : null;
 }
 
+export function cleanSlug(input: string): string {
+  if (!input) return "";
+  let unescaped = input;
+  try {
+    unescaped = decodeURIComponent(input);
+  } catch {
+    // keep as is
+  }
+  return unescaped
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export async function getInvitationBySlug(slug: string): Promise<InvitationData | null> {
+  const sanitizedSlug = cleanSlug(slug);
+  const rawDecoded = decodeURIComponent(slug);
+
   if (prisma) {
     try {
       await ensurePrismaSeeded();
-      const inv = await prisma.invitation.findUnique({
-        where: { slug },
+      let inv = await prisma.invitation.findUnique({
+        where: { slug: sanitizedSlug },
         include: {
           events: { orderBy: { displayOrder: "asc" } },
           familyMembers: { orderBy: { displayOrder: "asc" } },
           galleryImages: { orderBy: { displayOrder: "asc" } },
         },
       });
+
+      if (!inv) {
+        inv = await prisma.invitation.findFirst({
+          where: {
+            OR: [
+              { slug: slug },
+              { slug: rawDecoded },
+              { slug: slug.replace(/-/g, " ") },
+              { slug: rawDecoded.replace(/ /g, "-") }
+            ]
+          },
+          include: {
+            events: { orderBy: { displayOrder: "asc" } },
+            familyMembers: { orderBy: { displayOrder: "asc" } },
+            galleryImages: { orderBy: { displayOrder: "asc" } },
+          },
+        });
+      }
+
       if (inv) return formatPrismaInvitation(inv);
     } catch (err) {
       console.warn("Prisma getInvitationBySlug error, using fallback:", err);
     }
   }
 
-  const found = inMemoryInvitations.find((i) => i.slug === slug);
+  const found = inMemoryInvitations.find(
+    (i) =>
+      cleanSlug(i.slug || "") === sanitizedSlug ||
+      i.slug === slug ||
+      i.slug === rawDecoded
+  );
   return found ? { ...found } : null;
 }
 
