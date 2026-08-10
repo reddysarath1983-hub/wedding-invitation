@@ -53,9 +53,13 @@ export function CoverEnvelope({ groomName, brideName, weddingDate, couplePhoto, 
 
         {/* Middle Main Content */}
         <div className="py-6 relative z-10 flex-1 flex flex-col justify-center items-center">
-          {couplePhoto && (
+          {couplePhoto ? (
             <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-[#c59b27] p-1 shadow-md mb-4 bg-white">
               <img src={couplePhoto} alt="Couple" className="w-full h-full object-cover rounded-full" />
+            </div>
+          ) : (
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-[#c59b27]/60 p-1 shadow-inner mb-4 bg-[#58121a]/10 flex items-center justify-center text-[#c59b27]">
+              <Heart className="w-10 h-10 fill-[#58121a] text-[#c59b27]" />
             </div>
           )}
 

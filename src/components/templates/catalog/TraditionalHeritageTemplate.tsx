@@ -84,7 +84,7 @@ export function TraditionalHeritageTemplate({
                 onTransformChange={onTransformChange}
               />
             </div>
-          ) : (
+          ) : (groom_photo || bride_photo) ? (
             <div className="flex justify-center items-center gap-6 mb-6">
               {groom_photo && (
                 <div className="w-28 h-36 rounded-2xl overflow-hidden border-2 border-[#c59b27] p-1 bg-white shadow-md flex items-center justify-center">
@@ -116,6 +116,14 @@ export function TraditionalHeritageTemplate({
                   />
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="relative w-full max-w-md mx-auto aspect-[4/3] rounded-3xl overflow-hidden border-2 border-[#c59b27]/40 shadow-lg mb-6 p-4 bg-[#f5efe6] flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full bg-[#58121a]/10 border border-[#c59b27]/40 flex items-center justify-center text-[#58121a] mb-2">
+                <Heart className="w-8 h-8 fill-[#58121a]" />
+              </div>
+              <p className="font-telugu text-base font-bold text-[#58121a]">{groom_name} 💍 {bride_name}</p>
+              <p className="font-telugu text-xs text-[#8b6508] mt-1">వివాహ మహోత్సవ ఆహ్వాన పత్రిక</p>
             </div>
           )}
 
