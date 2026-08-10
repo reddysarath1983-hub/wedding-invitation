@@ -4,6 +4,10 @@ import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
 import { getInvitationBySlug } from "@/lib/db";
 
+// Force dynamic server-side rendering for all dynamic slugs on Vercel
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getInvitationData(slug: string): Promise<InvitationData | null> {
   try {
     const inv = await getInvitationBySlug(slug);
@@ -18,11 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const data = await getInvitationData(resolvedParams.slug);
   if (!data) {
     return {
-      title: "Invitation Not Found — PelliPatrika",
+      title: "Wedding Invitation — PelliPatrika",
     };
   }
 
-  const title = `${data.groom_name || "Wedding"} & ${data.bride_name || "Invitation"} — PelliPatrika (వివాహ శుభలేఖ)`;
+  const title = `${data.groom_name || "Groom"} & ${data.bride_name || "Bride"} — PelliPatrika (వివాహ శుభలేఖ)`;
   const description = `మా వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి వధూవరులను ఆశీర్వదించవలసిందిగా కోరుచున్నాము. Wedding Date: ${data.wedding_date} at ${data.venue_name}.`;
   const image = data.couple_photo || data.groom_photo || data.bride_photo || "";
 

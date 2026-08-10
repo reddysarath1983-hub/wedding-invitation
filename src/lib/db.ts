@@ -539,7 +539,21 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
       i.slug === slug ||
       i.slug === rawDecoded
   );
-  return found ? { ...found } : null;
+  if (found) return { ...found };
+
+  // Dynamic fallback invitation so any URL like /invite/sarath-kumar or /invite/surya-jyothika never 404s
+  const words = (sanitizedSlug || "wedding").split("-").filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1));
+  const groom = words[0] || "Sarath";
+  const bride = words.slice(1).join(" ") || "Priya";
+
+  return {
+    ...DEFAULT_DEMO_INVITATION,
+    id: `dyn-${sanitizedSlug}`,
+    slug: sanitizedSlug || "wedding",
+    groom_name: groom,
+    bride_name: bride,
+    status: "PUBLISHED"
+  };
 }
 
 export async function createInvitation(data: Partial<InvitationData>): Promise<InvitationData> {
