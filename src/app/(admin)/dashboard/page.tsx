@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useRouter from "next/navigation";
 import Link from "next/link";
 import { 
   fetchDashboardStats, fetchInvitations, publishInvitation, unpublishInvitation, 
@@ -11,7 +10,7 @@ import { InvitationData, DashboardStats } from "@/types/invitation";
 import { formatDate } from "@/lib/utils";
 import { 
   Plus, Edit, Copy, ExternalLink, Trash2, Eye, EyeOff, Sparkles, 
-  CheckCircle2, Clock, FileText, LogOut, Loader2, RefreshCw
+  CheckCircle2, Clock, FileText, LogOut, Loader2, RefreshCw, Check, Share2
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -19,6 +18,14 @@ export default function DashboardPage() {
   const [invitations, setInvitations] = useState<InvitationData[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [origin, setOrigin] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   const loadData = async () => {
     setLoading(true);
@@ -62,7 +69,7 @@ export default function DashboardPage() {
     setActionId(id);
     try {
       const newInv = await duplicateInvitation(id);
-      alert(`Invitation duplicated successfully! New draft slug: ${newInv.slug}`);
+      alert(`Invitation duplicated successfully! New draft link created.`);
       await loadData();
     } catch (err: any) {
       alert(err.message || "Failed to duplicate invitation");
@@ -84,6 +91,21 @@ export default function DashboardPage() {
     } finally {
       setActionId(null);
     }
+  };
+
+  const copyShareLink = (slug: string) => {
+    const fullUrl = `${origin || window.location.origin}/invite/${slug}`;
+    navigator.clipboard.writeText(fullUrl);
+    setCopiedSlug(slug);
+    setTimeout(() => setCopiedSlug(null), 2500);
+  };
+
+  const shareViaWhatsApp = (inv: InvitationData) => {
+    const fullUrl = `${origin || window.location.origin}/invite/${inv.slug}`;
+    const formattedDate = formatDate(inv.wedding_date);
+    const message = `🌸 *వివాహ ఆహ్వాన పత్రిక (Wedding Invitation)* 🌸\n\n*${inv.groom_name}* 💍 *${inv.bride_name}*\n\n📅 *తేదీ (Date):* ${formattedDate}\n📍 *స్థలం (Venue):* ${inv.venue_name}\n\nమా వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి మమ్మల్ని ఆశీర్వదించగలరు!\n\n👇 క్రింది లింక్ ద్వారా పూర్తి డిజిటల్ ఆహ్వాన పత్రికను వీక్షించండి:\n${fullUrl}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
   };
 
   return (
@@ -202,7 +224,7 @@ export default function DashboardPage() {
                     <th className="px-6 py-4">Wedding Date</th>
                     <th className="px-6 py-4">Template</th>
                     <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4">Public URL</th>
+                    <th className="px-6 py-4">Shareable Public URL</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -214,7 +236,7 @@ export default function DashboardPage() {
                           {inv.groom_name} 💍 {inv.bride_name}
                         </div>
                         <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                          ID: {inv.id}
+                          Slug: /invite/{inv.slug}
                         </div>
                       </td>
 
@@ -243,15 +265,44 @@ export default function DashboardPage() {
 
                       <td className="px-6 py-4 font-mono text-slate-400">
                         {inv.status === "PUBLISHED" ? (
-                          <a
-                            href={`/invite/${inv.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-amber-400 hover:underline flex items-center gap-1"
-                          >
-                            <span>/invite/{inv.slug}</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={`/invite/${inv.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-amber-400 hover:underline flex items-center gap-1 font-mono text-xs max-w-[200px] truncate"
+                              title={`${origin}/invite/${inv.slug}`}
+                            >
+                              <span>/invite/{inv.slug}</span>
+                              <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                            </a>
+
+                            <button
+                              onClick={() => copyShareLink(inv.slug!)}
+                              className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-sans flex items-center gap-1 transition-colors"
+                              title="Copy Full Shareable Link"
+                            >
+                              {copiedSlug === inv.slug ? (
+                                <>
+                                  <Check className="w-3 h-3 text-emerald-400" />
+                                  <span className="text-emerald-400">Copied!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  <span>Copy Link</span>
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => shareViaWhatsApp(inv)}
+                              className="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 transition-colors"
+                              title="Share via WhatsApp"
+                            >
+                              <Share2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-slate-600">/invite/{inv.slug} (Draft)</span>
                         )}

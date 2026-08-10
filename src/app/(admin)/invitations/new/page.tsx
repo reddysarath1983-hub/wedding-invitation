@@ -15,38 +15,23 @@ export default function CreateInvitationPage() {
   const [activeTab, setActiveTab] = useState<"form" | "preview">("form");
 
   const [previewData, setPreviewData] = useState<InvitationData>({
-    groom_name: "రాహుల్ (Rahul)",
-    bride_name: "ప్రియ (Priya)",
-    groom_photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
-    bride_photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-    couple_photo: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80",
-    wedding_date: "2026-11-20",
-    wedding_time: "10:30 AM",
-    venue_name: "శ్రీ వెంకటేశ్వర స్వామి కళ్యాణ మంటపం",
-    venue_address: "రోడ్ నెం. 12, బంజారా హిల్స్, హైదరాబాద్, తెలంగాణ - 500034",
-    google_maps_url: "https://maps.google.com/?q=Banjara+Hills+Hyderabad",
+    groom_name: "",
+    bride_name: "",
+    groom_photo: "",
+    bride_photo: "",
+    couple_photo: "",
+    wedding_date: "",
+    wedding_time: "",
+    venue_name: "",
+    venue_address: "",
+    google_maps_url: "",
     template_id: "traditional",
-    background_music_url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=flute-traditional-11234.mp3",
-    invitation_text: "శ్రీరస్తు శుభమస్తు అభయహస్తు.\nమా ప్రియమైన కుమారుడు రాహుల్ మరియు ప్రియమైన కుమార్తె ప్రియ ల వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి నూతన వధూవరులను ఆశీర్వదించవలసిందిగా మనస్ఫూర్తిగా ఆహ్వానిస్తున్నాము.",
+    background_music_url: "",
+    invitation_text: "",
     status: "DRAFT",
-    events: [
-      {
-        title: "మాంగల్య ధారణ వివాహ మహోత్సవం (Wedding Ceremony)",
-        date: "2026-11-20",
-        time: "10:30 AM",
-        venue: "శ్రీ వెంకటేశ్వర స్వామి కళ్యాణ మంటపం",
-        description: "శుభ సుముహూర్తమున లగ్న పత్రిక ప్రకారం వివాహ క్రతువు.",
-        display_order: 1
-      }
-    ],
-    family_members: [
-      { name: "శ్రీమతి & శ్రీ (వధువు తల్లిదండ్రులు)", relation: "వధువు తల్లిదండ్రులు", side: "bride", display_order: 1 },
-      { name: "శ్రీమతి & శ్రీ (వరుడి తల్లిదండ్రులు)", relation: "వరుడి తల్లిదండ్రులు", side: "groom", display_order: 2 }
-    ],
-    gallery_images: [
-      { image_url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80", display_order: 1 },
-      { image_url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80", display_order: 2 }
-    ]
+    events: [],
+    family_members: [],
+    gallery_images: []
   });
 
   useEffect(() => {
@@ -75,7 +60,8 @@ export default function CreateInvitationPage() {
     setIsSaving(true);
     try {
       const created = await createInvitation({ ...data, status: publish ? "PUBLISHED" : "DRAFT" });
-      alert(`Invitation ${publish ? "published" : "saved as draft"} successfully! Public URL: /invite/${created.slug}`);
+      const fullUrl = `${window.location.origin}/invite/${created.slug}`;
+      alert(`Invitation ${publish ? "published" : "saved as draft"} successfully!\n\nShareable URL:\n${fullUrl}`);
       router.push("/dashboard");
     } catch (err: any) {
       alert(err.message || "Failed to create invitation");
