@@ -465,25 +465,25 @@ export async function createInvitation(data: Partial<InvitationData>): Promise<I
           status: data.status || "DRAFT",
           events: {
             create: (data.events || []).map((e, idx) => ({
-              title: e.title,
-              date: e.date,
-              time: e.time,
-              venue: e.venue,
+              title: e.title || "Event",
+              date: e.date || "",
+              time: e.time || "",
+              venue: e.venue || "",
               description: e.description || null,
               displayOrder: e.display_order ?? idx,
             })),
           },
           familyMembers: {
             create: (data.family_members || []).map((f, idx) => ({
-              name: f.name,
-              relation: f.relation,
+              name: f.name || "Family Member",
+              relation: f.relation || "Family",
               side: f.side || "both",
               displayOrder: f.display_order ?? idx,
             })),
           },
           galleryImages: {
             create: (data.gallery_images || []).map((g, idx) => ({
-              imageUrl: g.image_url,
+              imageUrl: g.image_url || "",
               displayOrder: g.display_order ?? idx,
             })),
           },
@@ -579,25 +579,25 @@ export async function updateInvitation(id: string, data: Partial<InvitationData>
           status: data.status ?? existing.status,
           events: {
             create: (data.events ?? existing.events).map((e, idx) => ({
-              title: e.title,
-              date: e.date,
-              time: e.time,
-              venue: e.venue,
+              title: e.title || "Event",
+              date: e.date || "",
+              time: e.time || "",
+              venue: e.venue || "",
               description: e.description || null,
               displayOrder: e.display_order ?? idx,
             })),
           },
           familyMembers: {
             create: (data.family_members ?? existing.family_members).map((f, idx) => ({
-              name: f.name,
-              relation: f.relation,
+              name: f.name || "Family Member",
+              relation: f.relation || "Family",
               side: f.side || "both",
               displayOrder: f.display_order ?? idx,
             })),
           },
           galleryImages: {
             create: (data.gallery_images ?? existing.gallery_images).map((g, idx) => ({
-              imageUrl: g.image_url,
+              imageUrl: g.image_url || "",
               displayOrder: g.display_order ?? idx,
             })),
           },
