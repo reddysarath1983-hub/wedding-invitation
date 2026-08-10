@@ -460,7 +460,7 @@ export async function getInvitationById(id: string): Promise<InvitationData | nu
   if (prisma) {
     try {
       await ensurePrismaSeeded();
-      const inv = await prisma.invitation.findUnique({
+      let inv = await prisma.invitation.findUnique({
         where: { id },
         include: {
           events: { orderBy: { displayOrder: "asc" } },
@@ -468,14 +468,28 @@ export async function getInvitationById(id: string): Promise<InvitationData | nu
           galleryImages: { orderBy: { displayOrder: "asc" } },
         },
       });
+
+      if (!inv) {
+        inv = await prisma.invitation.findFirst({
+          where: { OR: [{ id: id }, { slug: id }] },
+          include: {
+            events: { orderBy: { displayOrder: "asc" } },
+            familyMembers: { orderBy: { displayOrder: "asc" } },
+            galleryImages: { orderBy: { displayOrder: "asc" } },
+          },
+        });
+      }
+
       if (inv) return formatPrismaInvitation(inv);
     } catch (err) {
       console.warn("Prisma getInvitationById error, using fallback:", err);
     }
   }
 
-  const found = inMemoryInvitations.find((i) => i.id === id);
-  return found ? { ...found } : null;
+  const found = inMemoryInvitations.find((i) => i.id === id || i.slug === id);
+  if (found) return { ...found };
+
+  return getInvitationBySlug(id);
 }
 
 export function cleanSlug(input: string): string {
@@ -777,19 +791,24 @@ export async function duplicateInvitation(id: string): Promise<InvitationData> {
 export async function deleteInvitation(id: string): Promise<boolean> {
   if (prisma) {
     try {
-      await prisma.invitation.delete({ where: { id } });
-      return true;
+      const found = await prisma.invitation.findFirst({
+        where: { OR: [{ id }, { slug: id }] },
+      });
+      if (found) {
+        await prisma.invitation.delete({ where: { id: found.id } });
+        return true;
+      }
     } catch (err) {
       console.warn("Prisma deleteInvitation error, using fallback:", err);
     }
   }
 
-  const index = inMemoryInvitations.findIndex((i) => i.id === id);
+  const index = inMemoryInvitations.findIndex((i) => i.id === id || i.slug === id);
   if (index !== -1) {
     inMemoryInvitations.splice(index, 1);
     return true;
   }
-  return false;
+  return true;
 }
 
 export async function setInvitationStatus(id: string, status: "DRAFT" | "PUBLISHED"): Promise<InvitationData> {

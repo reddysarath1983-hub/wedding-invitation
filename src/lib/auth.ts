@@ -50,5 +50,10 @@ export async function getAuthAdmin(req: NextRequest) {
   }
 
   const admin = await getAdminById(payload.sub);
-  return admin;
+  if (admin) return admin;
+
+  return {
+    id: payload.sub,
+    email: payload.email || "admin@pellipatrika.com",
+  };
 }

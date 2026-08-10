@@ -1,6 +1,6 @@
 import { InvitationData, DashboardStats } from "@/types/invitation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+const API_BASE = typeof window !== "undefined" ? "/api" : (process.env.NEXT_PUBLIC_API_URL || "/api");
 
 
 function getAuthHeader(): Record<string, string> {
