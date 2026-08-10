@@ -2,13 +2,11 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
-
 import { getInvitationBySlug } from "@/lib/db";
 
 async function getInvitationData(slug: string): Promise<InvitationData | null> {
   try {
     const inv = await getInvitationBySlug(slug);
-    if (!inv || inv.status !== "PUBLISHED") return null;
     return inv;
   } catch (err) {
     return null;
@@ -24,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const title = `${data.groom_name} & ${data.bride_name} — Wedding Invitation (వివాహ శుభలేఖ)`;
+  const title = `${data.groom_name || "Wedding"} & ${data.bride_name || "Invitation"} — PelliPatrika (వివాహ శుభలేఖ)`;
   const description = `మా వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి వధూవరులను ఆశీర్వదించవలసిందిగా కోరుచున్నాము. Wedding Date: ${data.wedding_date} at ${data.venue_name}.`;
   const image = data.couple_photo || data.groom_photo || data.bride_photo || "";
 
@@ -53,5 +51,14 @@ export default async function PublicInvitationPage({ params }: { params: Promise
     notFound();
   }
 
-  return <TemplateContainer data={data} />;
+  return (
+    <div className="relative">
+      {data.status === "DRAFT" && (
+        <div className="bg-amber-500 text-slate-950 px-4 py-2 text-center text-xs font-semibold font-telugu shadow-lg sticky top-0 z-50 flex items-center justify-center gap-2">
+          <span>⚠️ ఈ ఆహ్వాన పత్రిక ప్రస్తుతం డ్రాఫ్ట్‌లో ఉంది. అందరికీ షేర్ చేయడానికి అడ్మిన్ డాష్‌బోర్డ్ నుండి 'Publish' చేయండి.</span>
+        </div>
+      )}
+      <TemplateContainer data={data} />
+    </div>
+  );
 }

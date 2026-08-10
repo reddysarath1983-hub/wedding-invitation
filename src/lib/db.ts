@@ -178,10 +178,70 @@ function formatPrismaInvitation(inv: any): InvitationData {
   };
 }
 
+export function transliterateTeluguToEnglish(str: string): string {
+  if (!str) return "";
+
+  const commonMap: Record<string, string> = {
+    "సూర్య": "surya",
+    "జ్యోతిక": "jyothika",
+    "రాహుల్": "rahul",
+    "ప్రియ": "priya",
+    "అను": "anu",
+    "సాయి": "sai",
+    "కావ్య": "kavya",
+    "వెంకటేష్": "venkatesh",
+    "లక్ష్మి": "lakshmi",
+    "రామ్": "ram", "రాము": "ramu",
+    "సీత": "seetha",
+    "శివ": "shiva",
+    "పార్వతి": "parvathi",
+    "విష్ణు": "vishnu",
+    "కళ్యాణ్": "kalyan",
+    "పవణ్": "pavan",
+    "చింతల": "chintala",
+    "చి.ల.సౌ.": "",
+    "చి.": "",
+    "శ్రీ": "sri",
+    "శ్రీమతి": "srimathi",
+    "సౌభాగ్యవతి": "saubhagyavati"
+  };
+
+  let result = str;
+  for (const [tel, eng] of Object.entries(commonMap)) {
+    result = result.replace(new RegExp(tel, "g"), ` ${eng} `);
+  }
+
+  const teluguCharMap: Record<string, string> = {
+    'అ': 'a', 'ఆ': 'aa', 'ఇ': 'i', 'ఈ': 'ee', 'ఉ': 'u', 'ఊ': 'oo', 'ఋ': 'ru',
+    'ఎ': 'e', 'ఏ': 'ae', 'ఐ': 'ai', 'ఒ': 'o', 'ఓ': 'oo', 'ఔ': 'au', 'అం': 'am',
+    'క': 'ka', 'ఖ': 'kha', 'గ': 'ga', 'ఘ': 'gha', 'ఙ': 'nga',
+    'చ': 'cha', 'ఛ': 'chha', 'జ': 'ja', 'ఝ': 'jha', 'ఞ': 'nya',
+    'ట': 'ta', 'ఠ': 'tha', 'డ': 'da', 'ఢ': 'dha', 'ణ': 'na',
+    'త': 'tha', 'థ': 'thha', 'ద': 'da', 'ధ': 'dha', 'న': 'na',
+    'ప': 'pa', 'ఫ': 'pha', 'బ': 'ba', 'భ': 'bha', 'మ': 'ma',
+    'య': 'ya', 'ర': 'ra', 'ల': 'la', 'వ': 'va', 'శ': 'sha',
+    'ష': 'sha', 'స': 'sa', 'హ': 'ha', 'ళ': 'la', 'క్ష': 'ksha', 'ఱ': 'ra',
+    'ా': 'a', 'ి': 'i', 'ీ': 'ee', 'ు': 'u', 'ూ': 'oo', 'ృ': 'ru',
+    'ె': 'e', 'ే': 'ae', 'ై': 'ai', 'ొ': 'o', 'ో': 'oo', 'ౌ': 'au',
+    'ం': 'm', 'ః': 'h', '్': ''
+  };
+
+  let romanized = "";
+  for (const char of result) {
+    if (teluguCharMap[char] !== undefined) {
+      romanized += teluguCharMap[char];
+    } else {
+      romanized += char;
+    }
+  }
+
+  return romanized.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 // Slug generator
 export async function generateSlug(groomName: string, brideName: string, excludeId?: string, customSlug?: string): Promise<string> {
   let baseSlug = "";
-  if (customSlug && customSlug.trim()) {
+  if (customSlug && customSlug.trim() && customSlug.trim() !== "rahul-priya" && customSlug.trim() !== "wedding-invitation") {
     baseSlug = customSlug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
 
@@ -191,7 +251,13 @@ export async function generateSlug(groomName: string, brideName: string, exclude
   }
 
   if (!baseSlug) {
-    baseSlug = "rahul-priya";
+    const gRoman = transliterateTeluguToEnglish(groomName);
+    const bRoman = transliterateTeluguToEnglish(brideName);
+    baseSlug = `${gRoman}-${bRoman}`.replace(/^-+|-+$/g, "");
+  }
+
+  if (!baseSlug) {
+    baseSlug = "wedding";
   }
 
   let slug = baseSlug;
