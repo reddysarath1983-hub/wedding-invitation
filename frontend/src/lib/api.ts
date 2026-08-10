@@ -1,6 +1,7 @@
 import { InvitationData, DashboardStats } from "@/types/invitation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+
 
 function getAuthHeader(): Record<string, string> {
   if (typeof window !== "undefined") {
@@ -177,12 +178,5 @@ export async function uploadImage(file: File): Promise<string> {
   }
 
   const data = await res.json();
-  let url = data.url;
-  if (url.startsWith("/uploads/")) {
-    const serverOrigin = process.env.NEXT_PUBLIC_API_URL 
-      ? process.env.NEXT_PUBLIC_API_URL.replace("/api/v1", "")
-      : "http://127.0.0.1:8000";
-    url = `${serverOrigin}${url}`;
-  }
-  return url;
+  return data.url;
 }

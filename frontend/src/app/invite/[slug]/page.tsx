@@ -3,15 +3,13 @@ import { notFound } from "next/navigation";
 import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+import { getInvitationBySlug } from "@/lib/db";
 
 async function getInvitationData(slug: string): Promise<InvitationData | null> {
   try {
-    const res = await fetch(`${API_BASE}/invitations/public/${slug}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return res.json();
+    const inv = await getInvitationBySlug(slug);
+    if (!inv || inv.status !== "PUBLISHED") return null;
+    return inv;
   } catch (err) {
     return null;
   }

@@ -1,0 +1,81 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admins")
+}
+
+model Invitation {
+  id                 String         @id @default(uuid())
+  slug               String         @unique
+  groomName          String         @map("groom_name")
+  brideName          String         @map("bride_name")
+  groomPhoto         String?        @map("groom_photo")
+  bridePhoto         String?        @map("bride_photo")
+  couplePhoto        String?        @map("couple_photo")
+  weddingDate        String         @map("wedding_date")
+  weddingTime        String         @map("wedding_time")
+  venueName          String         @map("venue_name")
+  venueAddress       String         @map("venue_address")
+  googleMapsUrl      String?        @map("google_maps_url")
+  templateId         String         @default("traditional") @map("template_id")
+  backgroundMusicUrl String?        @map("background_music_url")
+  invitationText     String?        @map("invitation_text")
+  imageTransforms    String?        @map("image_transforms")
+  status             String         @default("DRAFT")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  events        Event[]
+  familyMembers FamilyMember[]
+  galleryImages GalleryImage[]
+
+  @@map("invitations")
+}
+
+model Event {
+  id           String     @id @default(uuid())
+  invitationId String     @map("invitation_id")
+  title        String
+  date         String
+  time         String
+  venue        String
+  description  String?
+  displayOrder Int        @default(0) @map("display_order")
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@map("events")
+}
+
+model FamilyMember {
+  id           String     @id @default(uuid())
+  invitationId String     @map("invitation_id")
+  name         String
+  relation     String
+  side         String     @default("both")
+  displayOrder Int        @default(0) @map("display_order")
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@map("family_members")
+}
+
+model GalleryImage {
+  id           String     @id @default(uuid())
+  invitationId String     @map("invitation_id")
+  imageUrl     String     @map("image_url")
+  displayOrder Int        @default(0) @map("display_order")
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@map("gallery_images")
+}
