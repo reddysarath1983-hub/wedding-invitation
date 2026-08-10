@@ -26,9 +26,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const title = `${data.groom_name || "Groom"} & ${data.bride_name || "Bride"} — PelliPatrika (వివాహ శుభలేఖ)`;
+  const groomName = data.groom_name || "Groom";
+  const brideName = data.bride_name || "Bride";
+  const title = `${groomName} & ${brideName} — Wedding Invitation (వివాహ శుభలేఖ)`;
   const description = `మా వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి వధూవరులను ఆశీర్వదించవలసిందిగా కోరుచున్నాము. Wedding Date: ${data.wedding_date} at ${data.venue_name}.`;
-  const image = data.couple_photo || data.groom_photo || data.bride_photo || "";
+
+  let shareImage = data.couple_photo || data.groom_photo || data.bride_photo || "";
+  if (!shareImage || !shareImage.startsWith("http")) {
+    shareImage = "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80";
+  }
 
   return {
     title,
@@ -36,13 +42,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title,
       description,
-      images: image ? [{ url: image }] : [],
+      images: [
+        {
+          url: shareImage,
+          width: 1200,
+          height: 630,
+          alt: `${groomName} & ${brideName} Wedding Invitation`
+        }
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: image ? [image] : [],
+      images: [shareImage],
     },
   };
 }

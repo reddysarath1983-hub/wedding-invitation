@@ -27,6 +27,18 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "PelliPatrika — Digital Telugu Wedding Invitations",
   description: "Create and publish customized, elegant digital Telugu wedding invitation websites.",
+  openGraph: {
+    title: "PelliPatrika — Digital Telugu Wedding Invitations",
+    description: "డిజిటల్ తెలుగు వివాహ ఆహ్వాన పత్రికలు (Digital Telugu Wedding Invitations)",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80",
+        width: 1200,
+        height: 630,
+        alt: "Telugu Wedding Couple Invitation"
+      }
+    ]
+  }
 };
 
 export default function RootLayout({
