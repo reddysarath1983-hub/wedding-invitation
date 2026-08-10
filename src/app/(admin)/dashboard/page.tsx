@@ -7,7 +7,7 @@ import {
   duplicateInvitation, deleteInvitation, logout, isAuthenticated 
 } from "@/lib/api";
 import { InvitationData, DashboardStats } from "@/types/invitation";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getCanonicalShareUrl } from "@/lib/utils";
 import { 
   Plus, Edit, Copy, ExternalLink, Trash2, Eye, EyeOff, Sparkles, 
   CheckCircle2, Clock, FileText, LogOut, Loader2, RefreshCw, Check, Share2
@@ -94,14 +94,14 @@ export default function DashboardPage() {
   };
 
   const copyShareLink = (slug: string) => {
-    const fullUrl = `${origin || window.location.origin}/invite/${slug}`;
+    const fullUrl = getCanonicalShareUrl(slug);
     navigator.clipboard.writeText(fullUrl);
     setCopiedSlug(slug);
     setTimeout(() => setCopiedSlug(null), 2500);
   };
 
   const shareViaWhatsApp = (inv: InvitationData) => {
-    const fullUrl = `${origin || window.location.origin}/invite/${inv.slug}`;
+    const fullUrl = getCanonicalShareUrl(inv.slug!);
     const formattedDate = formatDate(inv.wedding_date);
     const message = `🌸 *వివాహ ఆహ్వాన పత్రిక (Wedding Invitation)* 🌸\n\n*${inv.groom_name}* 💍 *${inv.bride_name}*\n\n📅 *తేదీ (Date):* ${formattedDate}\n📍 *స్థలం (Venue):* ${inv.venue_name}\n\nమా వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి మమ్మల్ని ఆశీర్వదించగలరు!\n\n👇 క్రింది లింక్ ద్వారా పూర్తి డిజిటల్ ఆహ్వాన పత్రికను వీక్షించండి:\n${fullUrl}`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;

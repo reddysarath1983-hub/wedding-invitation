@@ -8,6 +8,7 @@ import { InvitationData, ImageTransform } from "@/types/invitation";
 import { InvitationForm } from "@/components/admin/InvitationForm";
 import { LivePreview } from "@/components/admin/LivePreview";
 import { ArrowLeft, Edit3, Eye } from "lucide-react";
+import { getCanonicalShareUrl } from "@/lib/utils";
 
 export default function CreateInvitationPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function CreateInvitationPage() {
     setIsSaving(true);
     try {
       const created = await createInvitation({ ...data, status: publish ? "PUBLISHED" : "DRAFT" });
-      const fullUrl = `${window.location.origin}/invite/${created.slug}`;
+      const fullUrl = getCanonicalShareUrl(created.slug!);
       alert(`Invitation ${publish ? "published" : "saved as draft"} successfully!\n\nShareable URL:\n${fullUrl}`);
       router.push("/dashboard");
     } catch (err: any) {

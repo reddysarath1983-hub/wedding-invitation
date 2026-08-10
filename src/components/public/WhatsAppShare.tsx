@@ -1,7 +1,7 @@
 "use client";
 
 import { Share2, Heart } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getCanonicalShareUrl } from "@/lib/utils";
 
 interface WhatsAppShareProps {
   groomName: string;
@@ -21,9 +21,7 @@ export function WhatsAppShare({
   buttonClass = "bg-[#58121a] hover:bg-[#7c1a29] text-[#fdfbf7] border border-[#c59b27]/40"
 }: WhatsAppShareProps) {
   const handleShare = () => {
-    const publicUrl = typeof window !== "undefined" 
-      ? (slug ? `${window.location.origin}/invite/${slug}` : window.location.href)
-      : "";
+    const publicUrl = slug ? getCanonicalShareUrl(slug) : (typeof window !== "undefined" ? window.location.href : "");
     
     const formattedDate = formatDate(weddingDate);
     const message = `🌸 *వివాహ ఆహ్వాన పత్రిక (Wedding Invitation)* 🌸\n\n*${groomName}* 💍 *${brideName}*\n\n📅 *తేదీ (Date):* ${formattedDate}\n📍 *స్థలం (Venue):* ${venueName}\n\nమా వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి మమ్మల్ని ఆశీర్వదించగలరు!\n\n👇 క్రింది లింక్ ద్వారా పూర్తి డిజిటల్ ఆహ్వాన పత్రికను వీక్షించండి:\n${publicUrl}`;
