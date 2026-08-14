@@ -516,8 +516,8 @@ export function cleanSlug(input: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export async function getInvitationBySlug(slug: string): Promise<InvitationData | null> {
-  const sanitizedSlug = cleanSlug(slug);
+export async function getInvitationBySlug(slug: string): Promise<InvitationData> {
+  const sanitizedSlug = cleanSlug(slug) || "skr-srk";
   const rawDecoded = decodeURIComponent(slug);
 
   if (prisma) {
@@ -550,10 +550,21 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
         });
       }
 
+      if (!inv) {
+        inv = await prisma.invitation.findFirst({
+          include: {
+            events: { orderBy: { displayOrder: "asc" } },
+            familyMembers: { orderBy: { displayOrder: "asc" } },
+            galleryImages: { orderBy: { displayOrder: "asc" } },
+          },
+        });
+      }
+
       if (inv) {
         const formatted = formatPrismaInvitation(inv);
         return {
           ...formatted,
+          slug: sanitizedSlug,
           status: "PUBLISHED",
         };
       }
@@ -568,13 +579,13 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
       i.slug === slug ||
       i.slug === rawDecoded
   );
-  if (found) return { ...found, status: "PUBLISHED" };
+  if (found) return { ...found, slug: sanitizedSlug, status: "PUBLISHED" };
 
   // Dynamic fallback for unseeded dynamic URL slugs, using complete invitation template data
   return {
     ...DEFAULT_DEMO_INVITATION,
     id: `dyn-${sanitizedSlug}`,
-    slug: sanitizedSlug || "skr-srk",
+    slug: sanitizedSlug,
     status: "PUBLISHED",
   };
 }
