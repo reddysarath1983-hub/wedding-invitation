@@ -540,43 +540,22 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData>
 
   if (prisma) {
     try {
-      await ensurePrismaSeeded();
-      let inv = await prisma.invitation.findUnique({
-        where: { slug: sanitizedSlug },
+      const inv = await prisma.invitation.findFirst({
+        where: {
+          OR: [
+            { slug: sanitizedSlug },
+            { slug: slug },
+            { slug: rawDecoded },
+            { slug: "skr-srk" },
+            { slug: "rahul-priya" }
+          ]
+        },
         include: {
           events: { orderBy: { displayOrder: "asc" } },
           familyMembers: { orderBy: { displayOrder: "asc" } },
           galleryImages: { orderBy: { displayOrder: "asc" } },
         },
       });
-
-      if (!inv) {
-        inv = await prisma.invitation.findFirst({
-          where: {
-            OR: [
-              { slug: slug },
-              { slug: rawDecoded },
-              { slug: slug.replace(/-/g, " ") },
-              { slug: rawDecoded.replace(/ /g, "-") }
-            ]
-          },
-          include: {
-            events: { orderBy: { displayOrder: "asc" } },
-            familyMembers: { orderBy: { displayOrder: "asc" } },
-            galleryImages: { orderBy: { displayOrder: "asc" } },
-          },
-        });
-      }
-
-      if (!inv) {
-        inv = await prisma.invitation.findFirst({
-          include: {
-            events: { orderBy: { displayOrder: "asc" } },
-            familyMembers: { orderBy: { displayOrder: "asc" } },
-            galleryImages: { orderBy: { displayOrder: "asc" } },
-          },
-        });
-      }
 
       if (inv) {
         const formatted = formatPrismaInvitation(inv);
@@ -599,7 +578,6 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData>
   );
   if (found) return { ...found, slug: sanitizedSlug, status: "PUBLISHED" };
 
-  // Dynamic fallback for unseeded dynamic URL slugs, using complete invitation template data
   return {
     ...DEFAULT_DEMO_INVITATION,
     id: `dyn-${sanitizedSlug}`,
