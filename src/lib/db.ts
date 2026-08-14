@@ -310,11 +310,11 @@ async function ensurePrismaSeeded() {
       });
     }
 
-    const skrInv = await prisma.invitation.findFirst({
-      where: { OR: [{ slug: "skr-srk" }, { slug: "rahul-priya" }] }
+    const skrCheck = await prisma.invitation.findUnique({
+      where: { slug: "skr-srk" }
     });
 
-    if (!skrInv) {
+    if (!skrCheck) {
       await prisma.invitation.create({
         data: {
           slug: "skr-srk",
@@ -357,11 +357,6 @@ async function ensurePrismaSeeded() {
             })),
           },
         },
-      });
-    } else if (skrInv.status === "DRAFT") {
-      await prisma.invitation.update({
-        where: { id: skrInv.id },
-        data: { status: "PUBLISHED" },
       });
     }
   } catch (err) {
