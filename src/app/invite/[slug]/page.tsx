@@ -1,35 +1,32 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
-import { getInvitationBySlug } from "@/lib/db";
+import { getInvitationBySlug, cleanSlug, DEFAULT_DEMO_INVITATION } from "@/lib/db";
 
+// Force dynamic server-side rendering for all dynamic slugs on Vercel
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function generateStaticParams() {
-  return [
-    { slug: "skr-srk" },
-    { slug: "rahul-priya" },
-  ];
-}
-
-async function getInvitationData(slug: string): Promise<InvitationData | null> {
+async function getInvitationData(slug: string): Promise<InvitationData> {
   try {
     const inv = await getInvitationBySlug(slug);
-    return inv;
+    if (inv) return inv;
   } catch (err) {
-    return null;
+    console.error("Error loading invitation data:", err);
   }
+
+  const sanitized = cleanSlug(slug);
+  return {
+    ...DEFAULT_DEMO_INVITATION,
+    id: `dyn-${sanitized || "skr-srk"}`,
+    slug: sanitized || "skr-srk",
+    status: "PUBLISHED",
+  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const data = await getInvitationData(resolvedParams.slug);
-  if (!data) {
-    return {
-      title: "Wedding Invitation — PelliPatrika",
-    };
-  }
+  const data = await getInvitationData(resolvedParams.slug || "skr-srk");
 
   const groomName = data.groom_name || "Groom";
   const brideName = data.bride_name || "Bride";
@@ -52,8 +49,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           url: shareImage,
           width: 1200,
           height: 630,
-          alt: `${groomName} & ${brideName} Wedding Invitation`
-        }
+          alt: `${groomName} & ${brideName} Wedding Invitation`,
+        },
       ],
     },
     twitter: {
@@ -67,11 +64,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PublicInvitationPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const data = await getInvitationData(resolvedParams.slug);
-
-  if (!data) {
-    notFound();
-  }
+  const slugParam = resolvedParams?.slug || "skr-srk";
+  const data = await getInvitationData(slugParam);
 
   return (
     <div className="relative">

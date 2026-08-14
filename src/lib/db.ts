@@ -28,7 +28,7 @@ const DEFAULT_ADMIN = {
   createdAt: new Date(),
 };
 
-const DEFAULT_DEMO_INVITATION: InvitationData = {
+export const DEFAULT_DEMO_INVITATION: InvitationData = {
   id: "demo-invitation-1",
   slug: "skr-srk",
   groom_name: "రాహుల్ (Rahul)",
