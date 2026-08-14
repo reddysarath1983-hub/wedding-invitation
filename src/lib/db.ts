@@ -310,7 +310,7 @@ async function ensurePrismaSeeded() {
       });
     }
 
-    const skrCheck = await prisma.invitation.findUnique({
+    const skrCheck = await prisma.invitation.findFirst({
       where: { slug: "skr-srk" }
     });
 
@@ -318,45 +318,26 @@ async function ensurePrismaSeeded() {
       await prisma.invitation.create({
         data: {
           slug: "skr-srk",
-          groomName: DEFAULT_DEMO_INVITATION.groom_name,
-          brideName: DEFAULT_DEMO_INVITATION.bride_name,
-          groomPhoto: DEFAULT_DEMO_INVITATION.groom_photo,
-          bridePhoto: DEFAULT_DEMO_INVITATION.bride_photo,
-          couplePhoto: DEFAULT_DEMO_INVITATION.couple_photo,
-          weddingDate: DEFAULT_DEMO_INVITATION.wedding_date,
-          weddingTime: DEFAULT_DEMO_INVITATION.wedding_time,
-          venueName: DEFAULT_DEMO_INVITATION.venue_name,
-          venueAddress: DEFAULT_DEMO_INVITATION.venue_address,
-          googleMapsUrl: DEFAULT_DEMO_INVITATION.google_maps_url,
-          templateId: DEFAULT_DEMO_INVITATION.template_id,
-          backgroundMusicUrl: DEFAULT_DEMO_INVITATION.background_music_url,
-          invitationText: DEFAULT_DEMO_INVITATION.invitation_text,
+          groomName: "రాహుల్ (Rahul)",
+          brideName: "ప్రియ (Priya)",
+          groomPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+          bridePhoto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+          couplePhoto: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80",
+          weddingDate: "2026-11-20",
+          weddingTime: "10:30 AM",
+          venueName: "శ్రీ వెంకటేశ్వర స్వామి కళ్యాణ మంటపం (Sri Venkateswara Swamy Kalyana Mandapam)",
+          venueAddress: "రోడ్ నెం. 12, బంజారా హిల్స్, హైదరాబాద్, తెలంగాణ - 500034",
+          googleMapsUrl: "https://maps.google.com/?q=Banjara+Hills+Hyderabad",
+          templateId: "traditional",
+          backgroundMusicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=flute-traditional-11234.mp3",
+          invitationText: "శ్రీరస్తు శుభమస్తు అభయహస్తు.\nమా ప్రియమైన కుమారుడు రాహుల్ మరియు ప్రియమైన కుమార్తె ప్రియ ల వివాహ మహోత్సవానికి మీ కుటుంబ సమేతంగా విచ్చేసి నూతన వధూవరులను ఆశీర్వదించవలసిందిగా మనస్ఫూర్తిగా ఆహ్వానిస్తున్నాము.",
           status: "PUBLISHED",
-          events: {
-            create: DEFAULT_DEMO_INVITATION.events.map((e) => ({
-              title: e.title,
-              date: e.date,
-              time: e.time,
-              venue: e.venue,
-              description: e.description,
-              displayOrder: e.display_order,
-            })),
-          },
-          familyMembers: {
-            create: DEFAULT_DEMO_INVITATION.family_members.map((f) => ({
-              name: f.name,
-              relation: f.relation,
-              side: f.side,
-              displayOrder: f.display_order,
-            })),
-          },
-          galleryImages: {
-            create: DEFAULT_DEMO_INVITATION.gallery_images.map((g) => ({
-              imageUrl: g.image_url,
-              displayOrder: g.display_order,
-            })),
-          },
         },
+      });
+    } else if (skrCheck.status === "DRAFT") {
+      await prisma.invitation.update({
+        where: { id: skrCheck.id },
+        data: { status: "PUBLISHED" },
       });
     }
   } catch (err) {
