@@ -17,6 +17,7 @@ import {
 } from "./catalog";
 import { AudioPlayer } from "@/components/public/AudioPlayer";
 import { CoverEnvelope } from "@/components/public/CoverEnvelope";
+import { RSVPSection } from "@/components/public/RSVPSection";
 import { CanvaImageToolbar } from "@/components/admin/CanvaImageToolbar";
 
 interface TemplateContainerProps {
@@ -158,6 +159,7 @@ export function TemplateContainer({ data, editable = false, onTransformChange }:
 
         <div className="max-w-2xl mx-auto min-h-screen bg-[#fdfbf7] shadow-2xl relative">
           {renderTemplate()}
+          <RSVPSection slug={invData.slug} groomName={invData.groom_name} brideName={invData.bride_name} />
         </div>
         <AudioPlayer musicUrl={data.background_music_url} />
       </div>
