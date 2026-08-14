@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const slug = resolvedParams?.slug || "skr-srk";
 
   const invitation = await getInvitationBySlug(slug);
 
