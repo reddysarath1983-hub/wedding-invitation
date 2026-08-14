@@ -7,7 +7,18 @@ import { getInvitationBySlug, cleanSlug, DEFAULT_DEMO_INVITATION } from "@/lib/d
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+async function safeResolveSlug(params: any): Promise<string> {
+  if (!params) return "skr-srk";
+  try {
+    const resolved = await Promise.resolve(params);
+    return resolved?.slug || "skr-srk";
+  } catch {
+    return "skr-srk";
+  }
+}
+
 async function getInvitationData(slug: string): Promise<InvitationData> {
+  const sanitized = cleanSlug(slug);
   try {
     const inv = await getInvitationBySlug(slug);
     if (inv) return inv;
@@ -15,7 +26,6 @@ async function getInvitationData(slug: string): Promise<InvitationData> {
     console.error("Error loading invitation data:", err);
   }
 
-  const sanitized = cleanSlug(slug);
   return {
     ...DEFAULT_DEMO_INVITATION,
     id: `dyn-${sanitized || "skr-srk"}`,
@@ -24,9 +34,9 @@ async function getInvitationData(slug: string): Promise<InvitationData> {
   };
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const data = await getInvitationData(resolvedParams.slug || "skr-srk");
+export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
+  const slug = await safeResolveSlug(params);
+  const data = await getInvitationData(slug);
 
   const groomName = data.groom_name || "Groom";
   const brideName = data.bride_name || "Bride";
@@ -62,10 +72,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function PublicInvitationPage({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = await params;
-  const slugParam = resolvedParams?.slug || "skr-srk";
-  const data = await getInvitationData(slugParam);
+export default async function PublicInvitationPage({ params }: { params: any }) {
+  const slug = await safeResolveSlug(params);
+  let data: InvitationData;
+
+  try {
+    data = await getInvitationData(slug);
+  } catch {
+    data = {
+      ...DEFAULT_DEMO_INVITATION,
+      id: `fallback-${cleanSlug(slug)}`,
+      slug: cleanSlug(slug) || "skr-srk",
+      status: "PUBLISHED",
+    };
+  }
 
   return (
     <div className="relative">
