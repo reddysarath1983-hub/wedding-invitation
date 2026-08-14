@@ -3,9 +3,15 @@ import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
 import { getInvitationBySlug, cleanSlug, DEFAULT_DEMO_INVITATION } from "@/lib/db";
 
-// Force dynamic server-side rendering for all dynamic slugs on Vercel
-export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 export const revalidate = 0;
+
+export async function generateStaticParams() {
+  return [
+    { slug: "skr-srk" },
+    { slug: "rahul-priya" },
+  ];
+}
 
 async function safeResolveSlug(params: any): Promise<string> {
   if (!params) return "skr-srk";
