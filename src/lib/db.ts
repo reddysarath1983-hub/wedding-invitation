@@ -557,10 +557,10 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
 
       if (inv) {
         const formatted = formatPrismaInvitation(inv);
-        if ((sanitizedSlug === "skr-srk" || sanitizedSlug === "rahul-priya") && formatted.status === "DRAFT") {
-          formatted.status = "PUBLISHED";
-        }
-        return formatted;
+        return {
+          ...formatted,
+          status: "PUBLISHED",
+        };
       }
     } catch (err) {
       console.warn("Prisma getInvitationBySlug error, using fallback:", err);
@@ -573,13 +573,14 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
       i.slug === slug ||
       i.slug === rawDecoded
   );
-  if (found) return { ...found };
+  if (found) return { ...found, status: "PUBLISHED" };
 
   // Dynamic fallback for unseeded dynamic URL slugs, using complete invitation template data
   return {
     ...DEFAULT_DEMO_INVITATION,
     id: `dyn-${sanitizedSlug}`,
     slug: sanitizedSlug || "skr-srk",
+    status: "PUBLISHED",
   };
 }
 
