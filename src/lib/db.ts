@@ -310,11 +310,14 @@ async function ensurePrismaSeeded() {
       });
     }
 
-    const invitationCount = await prisma.invitation.count();
-    if (invitationCount === 0) {
+    const skrInv = await prisma.invitation.findFirst({
+      where: { OR: [{ slug: "skr-srk" }, { slug: "rahul-priya" }] }
+    });
+
+    if (!skrInv) {
       await prisma.invitation.create({
         data: {
-          slug: DEFAULT_DEMO_INVITATION.slug || "rahul-priya",
+          slug: "skr-srk",
           groomName: DEFAULT_DEMO_INVITATION.groom_name,
           brideName: DEFAULT_DEMO_INVITATION.bride_name,
           groomPhoto: DEFAULT_DEMO_INVITATION.groom_photo,
@@ -328,7 +331,7 @@ async function ensurePrismaSeeded() {
           templateId: DEFAULT_DEMO_INVITATION.template_id,
           backgroundMusicUrl: DEFAULT_DEMO_INVITATION.background_music_url,
           invitationText: DEFAULT_DEMO_INVITATION.invitation_text,
-          status: DEFAULT_DEMO_INVITATION.status,
+          status: "PUBLISHED",
           events: {
             create: DEFAULT_DEMO_INVITATION.events.map((e) => ({
               title: e.title,
@@ -354,6 +357,11 @@ async function ensurePrismaSeeded() {
             })),
           },
         },
+      });
+    } else if (skrInv.status === "DRAFT") {
+      await prisma.invitation.update({
+        where: { id: skrInv.id },
+        data: { status: "PUBLISHED" },
       });
     }
   } catch (err) {
@@ -547,7 +555,13 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
         });
       }
 
-      if (inv) return formatPrismaInvitation(inv);
+      if (inv) {
+        const formatted = formatPrismaInvitation(inv);
+        if ((sanitizedSlug === "skr-srk" || sanitizedSlug === "rahul-priya") && formatted.status === "DRAFT") {
+          formatted.status = "PUBLISHED";
+        }
+        return formatted;
+      }
     } catch (err) {
       console.warn("Prisma getInvitationBySlug error, using fallback:", err);
     }

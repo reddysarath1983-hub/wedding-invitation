@@ -10,9 +10,9 @@ export async function GET(
 
   const invitation = await getInvitationBySlug(slug);
 
-  if (!invitation || invitation.status !== "PUBLISHED") {
+  if (!invitation) {
     return NextResponse.json(
-      { detail: "Invitation not found or not published" },
+      { detail: "Invitation not found" },
       { status: 404 }
     );
   }
