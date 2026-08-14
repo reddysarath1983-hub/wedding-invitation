@@ -130,6 +130,17 @@ const DEFAULT_DEMO_INVITATION_RAHUL: InvitationData = {
 let inMemoryAdmins = [DEFAULT_ADMIN];
 let inMemoryInvitations: InvitationData[] = [DEFAULT_DEMO_INVITATION, DEFAULT_DEMO_INVITATION_RAHUL];
 
+function safeISOString(val: any): string | undefined {
+  if (!val) return undefined;
+  if (typeof val === "string") return val;
+  if (val instanceof Date) return val.toISOString();
+  try {
+    return new Date(val).toISOString();
+  } catch {
+    return undefined;
+  }
+}
+
 function formatPrismaInvitation(inv: any): InvitationData {
   if (!inv) return inv;
   let parsedTransforms = inv.imageTransforms;
@@ -158,8 +169,8 @@ function formatPrismaInvitation(inv: any): InvitationData {
     invitation_text: inv.invitationText || undefined,
     image_transforms: parsedTransforms || undefined,
     status: inv.status as "DRAFT" | "PUBLISHED",
-    created_at: inv.createdAt ? inv.createdAt.toISOString() : undefined,
-    updated_at: inv.updatedAt ? inv.updatedAt.toISOString() : undefined,
+    created_at: safeISOString(inv.createdAt),
+    updated_at: safeISOString(inv.updatedAt),
     events: (inv.events || []).map((e: any) => ({
       id: e.id,
       title: e.title,
