@@ -3,6 +3,7 @@ import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
 import { getInvitationBySlug, cleanSlug, DEFAULT_DEMO_INVITATION } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 export const revalidate = 0;
 
