@@ -4,9 +4,14 @@ import { TemplateContainer } from "@/components/templates/TemplateContainer";
 import { InvitationData } from "@/types/invitation";
 import { getInvitationBySlug } from "@/lib/db";
 
-// Force dynamic server-side rendering for all dynamic slugs on Vercel
-export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+export async function generateStaticParams() {
+  return [
+    { slug: "skr-srk" },
+    { slug: "rahul-priya" },
+  ];
+}
 
 async function getInvitationData(slug: string): Promise<InvitationData | null> {
   try {

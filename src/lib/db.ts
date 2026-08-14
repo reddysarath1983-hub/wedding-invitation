@@ -30,7 +30,7 @@ const DEFAULT_ADMIN = {
 
 const DEFAULT_DEMO_INVITATION: InvitationData = {
   id: "demo-invitation-1",
-  slug: "rahul-priya",
+  slug: "skr-srk",
   groom_name: "రాహుల్ (Rahul)",
   bride_name: "ప్రియ (Priya)",
   groom_photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
@@ -120,9 +120,15 @@ const DEFAULT_DEMO_INVITATION: InvitationData = {
   ],
 };
 
+const DEFAULT_DEMO_INVITATION_RAHUL: InvitationData = {
+  ...DEFAULT_DEMO_INVITATION,
+  id: "demo-invitation-2",
+  slug: "rahul-priya",
+};
+
 // In-memory fallback store for offline / dev mode without DATABASE_URL
 let inMemoryAdmins = [DEFAULT_ADMIN];
-let inMemoryInvitations: InvitationData[] = [DEFAULT_DEMO_INVITATION];
+let inMemoryInvitations: InvitationData[] = [DEFAULT_DEMO_INVITATION, DEFAULT_DEMO_INVITATION_RAHUL];
 
 function formatPrismaInvitation(inv: any): InvitationData {
   if (!inv) return inv;
@@ -555,28 +561,11 @@ export async function getInvitationBySlug(slug: string): Promise<InvitationData 
   );
   if (found) return { ...found };
 
-  // Dynamic fallback for unseeded dynamic URL slugs (returns clean empty photos so user photos are never overwritten by demo pictures)
-  const words = (sanitizedSlug || "wedding").split("-").filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1));
-  const groom = words[0] || "Groom";
-  const bride = words.slice(1).join(" ") || "Bride";
-
+  // Dynamic fallback for unseeded dynamic URL slugs, using complete invitation template data
   return {
+    ...DEFAULT_DEMO_INVITATION,
     id: `dyn-${sanitizedSlug}`,
-    slug: sanitizedSlug || "wedding",
-    groom_name: groom,
-    bride_name: bride,
-    groom_photo: undefined,
-    bride_photo: undefined,
-    couple_photo: undefined,
-    wedding_date: "2026-11-20",
-    wedding_time: "10:30 AM",
-    venue_name: "శ్రీ వెంకటేశ్వర స్వామి కళ్యాణ మంటపం",
-    venue_address: "హైదరాబాద్, తెలంగాణ",
-    template_id: "traditional",
-    status: "PUBLISHED",
-    events: [],
-    family_members: [],
-    gallery_images: []
+    slug: sanitizedSlug || "skr-srk",
   };
 }
 
